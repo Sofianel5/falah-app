@@ -2,20 +2,19 @@ import 'dart:async';
 import 'dart:core';
 import 'dart:io';
 import 'dart:convert';
-import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class ApiManager {
+/*class ApiManager {
   static const String _baseUrl = "";
   static const String _loginUrl = _baseUrl + "login/";
   String _storageKeyMobileToken = "token";
   static const String _applicationId = "falah_flutter_app";
   String token;
   String _deviceId;
-  final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
-  Future<String> _getDeviceIdentity() async {
+  //final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+  /* Future<String> _getDeviceIdentity() async {
     if (_deviceId == null) {
       try {
         if (Platform.isAndroid) {
@@ -30,7 +29,7 @@ class ApiManager {
       }
     }
     return _deviceId;
-  }
+  } */
 
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Future<String> _getMobileToken() async {
@@ -114,3 +113,4 @@ class ApiManager {
   }
 
 }
+*/

@@ -41,7 +41,7 @@ class _MeScreenState extends State<MeScreen> {
                       child: CircleAvatar(
                         radius: 65,
                         backgroundImage: NetworkImage(
-                            "https://www.nycaerospace.org/static/sofiane_larbi.jpg"),
+                            userRepo.user.pfpUrl),
                       ),
                     ),
                   ],
@@ -57,27 +57,22 @@ class _MeScreenState extends State<MeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.fromLTRB(45, 0, 15, 15),
-                child: Column(
-                  children: <Widget>[
-                    Text(
-                      "Your programs",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10,0,0,20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(userRepo.user.getFullName(),
+                style: TextStyle(fontSize: 25, 
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.25,),)
+              ],
+            ),
           ),
-          ProgramCarousel(),
+          ProgramCarousel(
+            title: "Upcoming programs",
+          ),
           _buildLogoutWidget(userRepo),
         ],
       ),

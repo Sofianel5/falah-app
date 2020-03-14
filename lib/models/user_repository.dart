@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:falah/models/program_model.dart';
 import 'package:falah/models/user_model.dart';
+import 'package:falah/models/venue_model.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:falah/api/urls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
@@ -17,7 +19,10 @@ class UserRepository with ChangeNotifier {
   User get user => _user;
 
   UserRepository() {
+    print("calling constructor");
     _getUser();
+    getVenues();
+    getPrograms();
   }
 
   Future<bool> signIn({
@@ -40,6 +45,8 @@ class UserRepository with ChangeNotifier {
         _user = await _getUser();
         _status = Status.Authenticated;
         notifyListeners();
+        getPrograms();
+        getVenues();
         return true;
       }
       _status = Status.Unauthenticated;
@@ -48,6 +55,27 @@ class UserRepository with ChangeNotifier {
     } catch (e) {
       _status = Status.Unauthenticated;
       notifyListeners();
+      return false;
+    }
+  }
+  Future<bool> resetPassword({
+    @required String email
+  }) async {
+    try {
+      var token = await _getToken();
+      Map data = {
+        "email": email,
+      };
+      var response = await http.get(Urls.PASSWORD_RESET_URL + "?email="+email, headers: {"Authorization": "Token " + token});
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print(response);
+      } else {
+        print(response);
+      }
+      return true;
+    } catch (e) {
+      print(e);
+      print("Error on sending");
       return false;
     }
   }
@@ -103,24 +131,123 @@ class UserRepository with ChangeNotifier {
       return token;
     }
   }
-  Future _getPrograms() async {
-    assert(_user != null);
+  Future<bool> registerForProgram(Program program) async {
+    try {
+      if (_status != Status.Authenticated) {
+        return Future<bool>.value(false);
+      } 
+      var token = await _getToken();
+      var payload = {"program": program.id.toString()};
+      print("registering you");
+      var response = await http.post(Urls.PROGRAM_REGISTER_URL, body: payload,
+        headers: {"Authorization": "Token " + token}
+      );
+      print(token);
+      if (response.statusCode == 200) {
+        var responseJson = json.decode(response.body);
+        print(responseJson);
+        return responseJson["success"];
+      }
+      return false;
+    } catch(e) {
+      print(e);
+      return false;
+    }
+  }
+  Future unregisterForProgram(Program program) async {
+    try {
+      if (_status != Status.Authenticated) {
+        return Future<bool>.value(false);
+      } 
+      var token = await _getToken();
+      var payload = {"program": program.id.toString()};
+      print("registering you");
+      var response = await http.post(Urls.PROGRAM_UNREGISTER_URL, body: payload,
+        headers: {"Authorization": "Token " + token}
+      );
+      print(token);
+      if (response.statusCode == 200) {
+        var responseJson = json.decode(response.body);
+        print(responseJson);
+        return responseJson["success"];
+      }
+      return false;
+    } catch(e) {
+      print(e);
+      return false;
+    }
+  }
+  Future getPrograms() async {
+    if (_status != Status.Authenticated) {
+      return;
+    }
     var token = await _getToken();
     print("getting programs");
-    var response = await http.post(Urls.PROGRAM_GETTER_URL,
+    var response = await http.get(Urls.PROGRAM_GETTER_URL,
       headers: {"Authorization": "Token " + token}
     );
     var responseJson;
     if (response.statusCode == 200) {
       // Set _user.programs
       responseJson = json.decode(response.body);
-      print(responseJson);
+      //print(responseJson);
+      _user.programs = [];
       for (var program in responseJson) {
         print(program);
-        _user.programs.add(Program.fromJson(program));
+        if (_user.programs != null) {
+          _user.programs.add(Program.fromJson(program));
+        } else {
+          _user.programs = [];
+          _user.programs.add(Program.fromJson(program));
+        }
       }
       notifyListeners();
     }
+    else {
+      print(response);
+    }
+  }
+  Future getVenues() async {
+    if (_status != Status.Authenticated) {
+      return;
+    }
+    var token = await _getToken();
+    print("getting venues");
+    var response = await http.get(Urls.VENUE_GETTER_URL,
+      headers: {"Authorization": "Token " + token}
+    );
+    var responseJson;
+    if (response.statusCode == 200) {
+      // Set _user.programs
+      responseJson = json.decode(response.body);
+      //print(responseJson);
+      _user.venues = [];
+      for (var venue in responseJson) {
+        print(Venue.fromJson(venue));
+        if (_user.venues != null) {
+          _user.venues.add(Venue.fromJson(venue));
+        } else {
+          _user.venues = [];
+          _user.venues.add(Venue.fromJson(venue));
+        }
+      }
+      notifyListeners();
+    }
+  }  
+  Future<Program> uploadProgram(Map<String, dynamic> jsonData) async {
+    var token = await _getToken();
+    var response = await http.post(Urls.LOGIN_URL, body: jsonData, headers: {"Authorization": "Token " + token});
+    if (response.statusCode == 200) {
+      Program program = Program.fromJson(json.decode(response.body));
+      return program;
+    } else {
+      return null;
+    }
+  }
+  Future<void> refresh() async {
+    await getPrograms();
+    await getVenues();
+    return ;
   }
   Future _getUser() async {
     print("getting user");
@@ -137,6 +264,8 @@ class UserRepository with ChangeNotifier {
       responseJson = json.decode(response.body);
       _user = User.fromJson(responseJson);
       print(_user);
+      getPrograms();
+      getVenues();
     }
   }
 

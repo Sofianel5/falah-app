@@ -1,7 +1,13 @@
+import 'dart:convert';
+
+import 'package:falah/api/urls.dart';
+import 'package:falah/models/user_model.dart';
+import 'package:http/http.dart' as http;
 import 'coordinates_model.dart';
 import 'city_model.dart';
 import 'program_model.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 
 part 'venue_model.g.dart';
 
@@ -10,23 +16,47 @@ class Venue {
   Venue({
     this.coordinates,
     this.city,
-    this.imgUrl,
+    this.img,
     this.programs,
-    this.name,
-    this.pk,
+    this.title,
+    this.id,
+    this.creator,
     this.value,
   });
   factory Venue.fromJson(Map<String, dynamic> json) => _$VenueFromJson(json);
   Map<String, dynamic> toJson() => _$VenueToJson(this);
 
+  String getImgUrl() {
+    return Urls.MEDIA_BASE_URL + img;
+  }
+  User creator;
   City city;
   Coordinates coordinates;
-  String imgUrl;
-  String name;
-  int pk;
+  String img;
+  String title;
+  int id;
   List<Program> programs;
   String value;
-}
+  String toString() {
+    return "creator: " + creator.toString() + "city: " + city.toString() + "\n coordinates: " + coordinates.toString() + "\n title: " + 
+    title.toString() + "\n img: " + img + "\n id: " + id.toString() + "\n programs: " + programs.toString() +
+    "\n value: " + value;
+  }
+  static Future<List<Venue>> getVenues(String cityName) async {
+    List<Venue> venues = [];
+    var response = await http.get(Urls.VENUE_GETTER_URL + "?city=" + cityName);
+    var responseJson;
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      responseJson = json.decode(response.body);
+      for (var venue in responseJson) {
+        print(Venue.fromJson(venue));
+        venues.add(Venue.fromJson(venue));
+      }
+    }
+    return venues;
+  }
+} 
+/*
 final List<Venue> venues = [
   Venue(
     coordinates: Coordinates(lat: 40.7721221, lng: -73.9265175),
@@ -46,4 +76,4 @@ final List<Venue> venues = [
     programs: programs,
     value: "ciana",
   ),
-];
+];*/

@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.only(left: 20.0, right: 120.0),
               child: Text(
-                "What would you like to learn?",
+                "Programs",
                 style: TextStyle(
                   fontSize: 30.0,
                   fontWeight: FontWeight.bold,

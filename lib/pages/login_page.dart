@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:falah/models/user_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:falah/screens/create_account_screen.dart';
+import 'package:falah/screens/reset_password_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:falah/api/urls.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -70,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                       height: 30,
                     ),
                     _buildPasswordField(),
-                    _buildForgotPasswordBtn(),
+                    _buildForgotPasswordBtn(user),
                     _buildLoginButton(user),
                     _buildSignupText(),
                     _buildSignupButton(user),
@@ -178,18 +181,26 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildForgotPasswordBtn() {
+  Widget _buildForgotPasswordBtn(UserRepository user) {
     return GestureDetector(
       onTap: () => print("forgot passoword"),
       child: Container(
         alignment: Alignment.centerRight,
         child: FlatButton(
-          onPressed: () => print("Forgot password"),
+          onPressed: () => _launchURL(),//Navigator.push(context, MaterialPageRoute(builder: (_) => PasswordResetScreen(user))),
           child: Text("Forgot password?"),
         ),
       ),
     );
   }
+_launchURL() async {
+  var url = Urls.PASSWORD_RESET_URL;
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
 
   Widget _buildLoginButton(UserRepository user) {
     return GestureDetector(

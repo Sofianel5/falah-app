@@ -43,5 +43,9 @@
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>In order for us to show you events in your city, we need your location.</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<string>YES</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library in order to allow you to upload images when creating programs.</string>
 </dict>
 </plist>

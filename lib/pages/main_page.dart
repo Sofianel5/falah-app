@@ -1,5 +1,7 @@
+import 'package:falah/api/urls.dart';
 import 'package:flutter/material.dart';
 import 'package:falah/screens/home_screen.dart';
+import 'package:falah/screens/create_screen.dart';
 import 'package:falah/screens/me_screen.dart';
 import 'package:falah/models/user_repository.dart';
 import 'package:provider/provider.dart';
@@ -13,12 +15,13 @@ class _MainPageState extends State<MainPage> {
   int _selectedPage = 0;
   final List<Widget> _mainPages = [
     HomeScreen(),
-    HomeScreen(),
+    CreateScreen(),
     MeScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final userRepo = Provider.of<UserRepository>(context);
     return Scaffold(
       body: _mainPages[_selectedPage],
       bottomNavigationBar: BottomNavigationBar(
@@ -41,7 +44,8 @@ class _MainPageState extends State<MainPage> {
             icon: CircleAvatar(
               radius: 15,
               backgroundImage: NetworkImage(
-                  "https://www.nycaerospace.org/static/sofiane_larbi.jpg"),
+                userRepo.user != null ? userRepo.user.pfpUrl ?? Urls.DEFAULT_PFP_URL : Urls.DEFAULT_PFP_URL,
+              ),
             ),
             title: SizedBox.shrink(),
           ),

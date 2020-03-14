@@ -1,6 +1,10 @@
+import 'dart:convert';
+
+import 'package:falah/api/urls.dart';
 import 'package:falah/models/venue_model.dart';
 import 'city_model.dart';
 import 'coordinates_model.dart';
+import 'package:http/http.dart' as http;
 import 'session_model.dart';
 import 'user_model.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -8,38 +12,193 @@ part 'program_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class Program {
+  static Future<List<List<String>>> getPrimarySubjects() async {
+    var response = await http.get(Urls.PRIMARY_SUBJECTS_GETTER_URL);
+    var responseJson;
+    if (response.statusCode == 200) {
+      // Set _user.programs
+      responseJson = json.decode(response.body);
+      print(responseJson);
+      return responseJson;
+    }
+    else {
+      print(response);
+      return Future.delayed(Duration.zero);
+    }
+  } 
+  static Future<List<List<String>>> getSecondarySubjects() async {
+    var response = await http.get(Urls.SECONDARY_SUBJECTS_GETTER_URL);
+    var responseJson;
+    if (response.statusCode == 200) {
+      // Set _user.programs
+      responseJson = json.decode(response.body);
+      print(responseJson);
+      return responseJson;
+    }
+    else {
+      print(response);
+      return Future.delayed(Duration.zero);
+    }
+  } 
   Program({
-    this.imgUrl,
-    this.pk,
-    this.title,
+    this.img,
+    this.id,
     this.type,
     this.primarySubject,
     this.secondarySubject,
     this.sessions,
     this.description,
     this.venue,
+    this.name,
     this.active,
     this.full,
     this.creator,
-    this.tags
+    this.tags,
+    this.maxAttendees,
+    this.userIsRegistered,
+    this.createdBySelf
   });
-
+  String getImgUrl() {
+    return Urls.MEDIA_BASE_URL + img;
+  }
   bool active;
   User creator;
   bool full;
-  String imgUrl;
-  int pk;
+  String img;
+  int id;
+  
+  @JsonKey(name: 'max_attendees')
+  int maxAttendees;
+
   String description;
+
+  @JsonKey(name: 'primary_subject')
   String primarySubject;
+
+  @JsonKey(name: 'secondary_subject')
   String secondarySubject;
   List<Session> sessions;
-  List<String> tags;
-  String title;
+  String name;
+  bool createdBySelf;
+  bool userIsRegistered;
+  String tags;
   String type;
   Venue venue;
+  List<String> getTags() {
+    return tags.split(" ");
+  }
+  void getVenue() async {
+    print("getting venue for program");
+    var response = await http.get(Urls.VENUE_FROM_PROGRAM_GETTER_URL);
+    var responseJson;
+    if (response.statusCode == 200) {
+      // Set _user.programs
+      responseJson = json.decode(response.body);
+      //print(responseJson);
+      print(responseJson);
+      venue = Venue.fromJson(responseJson);
+    }
+  }
+  String toString() {
+    return "active: " + active.toString() + "\n creator: " + creator.toString() + "\n full: " + 
+    full.toString() + "\n img: " + img + "\n id: " + id.toString() + "\n description: " + description +
+    "\n primarySubject: " + primarySubject + "\n secondarySubject: " + secondarySubject + "\n sessions: " + sessions.toString() +
+    "\n tags: " + tags + "\n type: " + type;
+  }
   factory Program.fromJson(Map<String, dynamic> json) => _$ProgramFromJson(json);
   Map<String, dynamic> toJson() => _$ProgramToJson(this);
+  static const List<List<String>> PRIMARY_SUBJECTS = [
+    [
+        "math",
+        "Math"
+    ],
+    [
+        "english",
+        "English"
+    ],
+    [
+        "foreign_language",
+        "Foreign Language"
+    ],
+    [
+        "science",
+        "Science"
+    ],
+    [
+        "social_science",
+        "Social Science"
+    ],
+    [
+        "political",
+        "Political"
+    ],
+    [
+        "skills",
+        "Skills"
+    ],
+    [
+        "other",
+        "Other"
+    ]
+  ];
+  static const SECONDARY_SUBJECTS = {
+    "math": [
+      ["elementry", "Elementry School"],
+      ["preAlgebra", "Pre Algebra"],
+      ["algebra", "Algebra"],
+      ["geometry", "Geometry"],
+      ["basicApp", "Basic applications"],
+      ["preCalculus", "Pre Calculus"],
+      ["calculus", "Calculus"],
+      ["mcalc", "Multivariable Calculus"],
+      ["lalgebra", "Linear Algebra"],
+      ["advancedApp", "Advanced applications"],
+    ],
+    "science": [
+      ["astro", "Astrophysics"],
+      ["bio", "Biology"],
+      ["chem", "Chemistry"],
+      ["cs", "Computer Science"],
+      ["orgo", "Organic Chemistry"],
+      ["physics", "Physics"],
+      ["medicine", "Medicine"],
+      ["zoology", "Zoology"],
+    ],
+    "english": [
+      ["fiction", "Fiction"],
+      ["nonfiction", "Non-fiction"],
+      ["poetry", "Poetry"],
+    ],
+    "foreign_language": [
+      ["spanish", "Spanish"],
+      ["german", "German"],
+      ["french", "French"],
+      ["russian", "Russian"],
+      ["arabic", "Arabic"],
+      ["chinese", "Chinese"],
+    ],
+    "social_science": [
+      ["econ", "Economics"],
+      ["polsci", "Political Science"],
+      ["sociology", "Sociology"],
+      ["psych", "Psychology"],
+    ],
+    "political": [
+      ["voting", "Voting"],
+      ["immigration", "Imigration Law"],
+      ["taxes", "Taxes"]
+    ],
+    "skills": [
+      ["sports", "Sports"],
+      ["woodworking", "Woodworking"],
+      ["fishing", "Fishing"],
+    ],
+    "other": [
+      ["other", "Other"]
+    ]
+  };
 }
+/*
 List<Program> programs = [
   Program(
     imgUrl: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Soyuz_TMA-9_launch.jpg",
@@ -117,3 +276,4 @@ List<Program> programs = [
     tags: ["HTML", "CSS", "Flutter"],
   ),
 ];
+*/

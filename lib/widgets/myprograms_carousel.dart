@@ -70,7 +70,7 @@ class _MyProgamCarouselState extends State<MyProgramCarousel> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
-                              Text('${program.title}',
+                              Text('${program.name}',
                                   style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.w600,
@@ -107,7 +107,7 @@ class _MyProgamCarouselState extends State<MyProgramCarousel> {
                               child: Image(
                                 height: 180,
                                 width: 280,
-                                image: NetworkImage(program.imgUrl),
+                                image: NetworkImage(program.getImgUrl()),
                                 fit: BoxFit.cover,
                               )),
                           Positioned(
@@ -116,7 +116,7 @@ class _MyProgamCarouselState extends State<MyProgramCarousel> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Text(program.venue.name,
+                                Text(program.venue.title,
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 15,
