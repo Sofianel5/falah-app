@@ -42,7 +42,7 @@ class UserRepository with ChangeNotifier {
       if (response.statusCode == 200) {
         jsonData = json.decode(response.body);
         sharedPrefrences.setString("token", jsonData["auth_token"]);
-        _user = await _getUser();
+        _getUser();
         _status = Status.Authenticated;
         notifyListeners();
         getPrograms();
